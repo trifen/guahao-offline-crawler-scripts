@@ -66,7 +66,10 @@ with open(sourceFilePath) as sf:
                 shihuaPrice = ''.join([p.text for p in consulTypes[1]])
 
                 # Comment
-                nComment = soup.select('div.grid-title > div.tip > a > strong')[0].text
+                nComment = ''
+                sComment = soup.select('section.expert-comment')
+                if len(sComment) > 0:
+                    nComment = sComment[0].select('div.grid-title > div.tip > a > strong')[0].text
 
                 rf.write('\n'+defaultSeperator.join([drName,drID,departments,occ,
                                                      nApm,nAcc,eRate,
