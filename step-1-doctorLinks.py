@@ -24,7 +24,7 @@ guahaoDepartmentID = {
 
 # defaultHeaders = {'User-Agent': ''}
 defaultSeperator = ','
-resultHeaders = [ '医生姓名','医生ID' ]
+resultHeaders = [ '医生姓名','医生ID','医院','科室']
 resultFilePath = './step-1-result.csv'
 
 # GRAB DOCTOR LINKS
@@ -51,6 +51,12 @@ with open(resultFilePath, "w") as rf:
 
             while not stop:
 
+                # REMOVE ME
+                if counter > 5:
+                    stop = True
+                    break
+                # END REMOVE ME
+
                 # next page
                 pageNo += 1
                 print('Crawling '+dpName+' doctor link, page '+str(pageNo))
@@ -70,7 +76,12 @@ with open(resultFilePath, "w") as rf:
 
                     for dt in doctorList:
                         doctor = dt.select('dt')[0].select('a')[0]
-                        key = defaultSeperator.join([doctor['title'], doctor['monitor-doctor-id']])
+                        title = doctor['title']
+                        did = doctor['monitor-doctor-id']
+                        info = dt.select('dd')[0].select('p')
+                        dn = info[0].text.strip()
+                        hn = info[1].text.strip()
+                        key = defaultSeperator.join([title, did, hn, dn])
                         if not key in doctorIDDict:
                             doctorIDDict[key] = True
                             rf.write('\n'+key)

@@ -35,7 +35,7 @@ with open(sourceFilePath) as sf:
 
         for row in sf:
 
-            [drName,drID] = row.strip().split(defaultSeperator)
+            [drName,drID,hosN,depN] = row.strip().split(defaultSeperator)
             counter+=1
             print('No '+str(counter)+', Crawling info of '+drName+', '+drID)
 
