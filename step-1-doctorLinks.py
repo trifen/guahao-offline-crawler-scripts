@@ -22,6 +22,10 @@ guahaoDepartmentID = {
     '7f682eb6-cff3-11e1-831f-5cf9dd2e7135':'儿童骨科'
 }
 
+# Filters, 以下条件不能同时使用
+includedHospitalKeywords   = []
+excludedHospitalKeywords   = ['儿']
+
 # defaultHeaders = {'User-Agent': ''}
 defaultSeperator = ','
 resultHeaders = [ '医生姓名','医生ID','医院','科室']
@@ -51,12 +55,6 @@ with open(resultFilePath, "w") as rf:
 
             while not stop:
 
-                # REMOVE ME
-                if counter > 5:
-                    stop = True
-                    break
-                # END REMOVE ME
-
                 # next page
                 pageNo += 1
                 print('Crawling '+dpName+' doctor link, page '+str(pageNo))
@@ -81,11 +79,30 @@ with open(resultFilePath, "w") as rf:
                         info = dt.select('dd')[0].select('p')
                         dn = info[0].text.strip()
                         hn = info[1].text.strip()
-                        key = defaultSeperator.join([title, did, hn, dn])
-                        if not key in doctorIDDict:
-                            doctorIDDict[key] = True
-                            rf.write('\n'+key)
-                            counter+=1
+
+                        # 默认不抓取
+                        needed = False
+
+                        # 抓取含有关键字的科室(在26行添加 includedHospitalKeywords)
+                        if len(includedHospitalKeywords) > 0:
+                            for inhkey in includedHospitalKeywords:
+                                if inhkey in hn:
+                                    needed = True
+
+                        # 剔除含有关键字的科室(在27行添加 excludedHospitalKeywords)
+                        if len(excludedHospitalKeywords) > 0:
+                            needed = True
+                            for exhkey in excludedHospitalKeywords:
+                                if exhkey in hn:
+                                    needed = False
+
+                        if needed:
+                            print('Crawling '+hn+' '+dn)
+                            key = defaultSeperator.join([title, did, hn, dn])
+                            if not key in doctorIDDict:
+                                doctorIDDict[key] = True
+                                rf.write('\n'+key)
+                                counter+=1
 
                 except Exception as e:
                     traceback.print_exc()
